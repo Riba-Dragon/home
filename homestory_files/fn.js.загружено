@@ -1,0 +1,306 @@
+/*
+ * http://traffgui.ru/
+ */
+$$ajx = function (arg) {
+	arg = arg || {};
+	
+	var default_arg = {
+		type:'get',
+		url:'',
+		data:{},
+		response:'text',
+		header:{
+			'Content-Type':'application/x-www-form-urlencoded; charset=windows-1251',
+			'Referer':location.href
+		},
+		async:true,
+		username:'',
+		password:'',
+		errrep:false,
+		error:function(num) {
+			var arr=['Your browser does not support Ajax',
+					 'Request failed',
+					 'Address does not exist',
+					 'The waiting time left'];
+			
+			alert(arr[num]);
+		},
+		status:function (number) {
+			
+		},
+		endstatus:function (number) {
+			
+		},
+		success:function (data) {
+			
+		},
+		timeout:0
+	}
+	
+	for(var index in default_arg) {
+		if(typeof arg[index] == "undefined") arg[index] = default_arg[index];
+	}
+	
+	
+	var type = arg['type'];
+	var url = arg['url'];
+	var data = arg['data'];
+	var response = arg['response'];
+	var header = arg['header'];
+	var async = arg['async'];
+	var username = arg['username'];
+	var password = arg['password'];
+	var errrep = arg['errrep'];
+	var error = arg['error'];
+	var status = arg['status'];
+	var endstatus = arg['endstatus'];
+	var success = arg['success'];
+	var timeout = arg['timeout'];
+	
+	
+	var obj = function () {
+		var req = null;
+		if (window.XMLHttpRequest) {
+			try {
+				req = new XMLHttpRequest();
+			}
+			catch (e){
+			}
+		}
+		else if (window.ActiveXObject) {
+			try {
+				req = new ActiveXObject('Msxml2.XMLHTTP');
+			}
+			catch (e) {
+				try {
+					req = new ActiveXObject('Microsoft.XMLHTTP');
+				}
+				catch (e) {
+				}
+			}
+		}
+		return req;
+	}
+	
+	
+		var encurl=function (d) {
+			var query = [];
+			if (d instanceof Object) {
+				for (var k in d) {
+					query.push(encodeURIComponent(k) + '=' + encodeURIComponent(d[k]));
+				}
+				return query.join('&');
+			}
+			else {
+				return encodeURIComponent(d);
+			}
+		}
+		
+	
+		var parsehead = function(headertxt) {
+			var headers = {};
+			var ls = /^\s*/;
+			var ts = /\s*$/;
+			var lines = headertxt.split("\n");
+			for(var i = 0; i < lines.length; i++) {
+				var line = lines[i];
+				if (line.length == 0) continue;
+				var pos = line.indexOf(':');     
+				var name = line.substring(0, pos).replace(ls, "").replace(ts, "");
+				var value = line.substring(pos+1).replace(ls, "").replace(ts, "");
+				headers[name] = value;
+			}
+			return headers;
+		}
+	
+	
+		var req=obj();
+	
+		if(req!==null) {
+		
+			var fullurl=url+'?'+encurl(data);
+		
+			if(type=='get') {
+				(username=='' && password=='') ? req.open("GET", fullurl, async) : req.open("GET", fullurl, async, username, password);
+			}
+			else if(type=='post') {
+				(username=='' && password=='') ? req.open("POST", url, async) : req.open("POST", url, async, username, password);
+			}
+			else if(type=='head') {
+				(username=='' && password=='') ? req.open("HEAD", fullurl, async) : req.open("HEAD", fullurl, async, username, password);
+			}
+		
+				if (header instanceof Object) {
+					for(var key in header) {
+						req.setRequestHeader(key,header[key]);
+					}
+				}
+				
+				
+				if(!async) {
+					
+					if(type=='get' || type=='head') {
+						req.send(null);
+					}
+					else if(type=='post') {
+						req.send(encurl(data));
+					}
+					
+						
+					endstatus(req.status);
+					
+					if(req.status == 200) {
+					
+						if(type=='get' || type=='post') {
+							if(response=='text') {
+								success(req.responseText);
+							}
+							else if(response=='xml') {
+								success(req.responseXML);
+							}
+						}
+						else if(type=='head') {
+							success(parsehead(req.getAllResponseHeaders()));
+						}
+					
+					}
+					else if(req.status == 404) {
+						if(errrep) {error(2);}
+					}
+					else {
+						if(errrep) {error(1);}
+					}
+					
+					
+				}
+				else {
+		
+			req.onreadystatechange = function () {
+			
+				status(req.readyState);
+			
+				if(req.readyState == 4) {
+					
+						if(reqtime) {
+							clearTimeout(reqtime);
+						}
+					
+					endstatus(req.status);
+					
+					if(req.status == 200) {
+					
+						if(type=='get' || type=='post') {
+							if(response=='text') {
+								success(req.responseText);
+							}
+							else if(response=='xml') {
+								success(req.responseXML);
+							}
+						}
+						else if(type=='head') {
+							success(parsehead(req.getAllResponseHeaders()));
+						}
+					
+					}
+					else if(req.status == 404) {
+						if(errrep) {error(2);}
+					}
+					else {
+						if(errrep) {error(1);}
+					}
+				}
+			
+			}
+				
+					if(type=='get' || type=='head') {
+						req.send(null);
+					}
+					else if(type=='post') {
+						req.send(encurl(data));
+					}
+					
+					
+					if(timeout>0) {
+						var reqtime = setTimeout(function () { if(req.readyState!=4) { req.abort(); if(errrep) {error(3);} } }, timeout);
+					}
+				
+				}
+				
+			
+		}
+		else {
+			if(errrep) {error(0);}
+		}
+	
+}
+
+$$evtadd = function(elem, type, func) {
+	if(elem.addEventListener) {
+		elem.addEventListener(type,func,false);
+	}
+	else if(elem.attachEvent) {
+		elem.attachEvent('on'+type,func);
+	}
+	else {
+		elem['on'+type] = func;
+	}
+}
+
+$$evtdel = function(elem, type, func) {
+	if(elem.removeEventListener) {
+		elem.removeEventListener(type,func,false);
+	}
+	else if(elem.detachEvent) {
+		elem.detachEvent('on'+type,func);
+	}
+	else {
+		delete elem['on'+type];
+	}
+}
+
+$$cooset = function(cookie_name, cookie_value, cookie_expires, cookie_path, cookie_domain, cookie_secure) {
+	if(cookie_name!==undefined) {
+		cookie_expires=cookie_expires || 0;
+		var expire_date = new Date;
+		expire_date.setTime(expire_date.getTime() + (cookie_expires*1000));
+		document.cookie = cookie_name + "=" + encodeURIComponent(cookie_value)+'; ' + 
+		((cookie_expires === undefined) ? '' : 'expires=' + expire_date.toGMTString()+'; ') +
+		((cookie_path === undefined) ? 'path=/;' : 'path='+cookie_path+'; ') +
+		((cookie_domain === undefined) ? '' : 'domain='+cookie_domain+'; ') +
+		((cookie_secure === true) ? 'secure; ' : '');
+	}
+}
+
+$$cooget = function(cookie_name) {
+	var cookie = document.cookie, length = cookie.length;
+	if(length) {
+		var cookie_start = cookie.indexOf(cookie_name + '=');
+		if(cookie_start != -1) {
+			var cookie_end = cookie.indexOf(';', cookie_start);
+			if(cookie_end == -1) {
+				cookie_end = length;
+			}
+			cookie_start += cookie_name.length + 1;
+			return decodeURIComponent(cookie.substring(cookie_start, cookie_end));
+		}
+	}
+}
+
+$$coodel = function(cookie_name) {
+	$$cooset(cookie_name, '', -1);
+}
+
+$$sclbp = function() {
+        if (window.innerWidth || window.innerHeight) {
+                return {"l":window.pageXOffset,"t":window.pageYOffset};
+        }
+        else if (document.documentElement && (document.documentElement.clientWidth || document.documentElement.clientHeight)) {
+                return {"l":document.documentElement.scrollLeft,"t":document.documentElement.scrollTop};
+        }
+        else if (document.body.clientWidth || document.body.clientHeight) {
+                return {"l":document.body.scrollLeft,"t":document.body.scrollTop};
+        }
+        else {
+                return {"l":0,"t":0};
+        }
+}
